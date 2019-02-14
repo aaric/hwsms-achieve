@@ -1,0 +1,11 @@
+# Spring settings
+spring:
+  profiles:
+    active: dev
+
+# Huawei Cloud settings
+huawei:
+  sms:
+    apiHost: https://api.rtc.huaweicloud.com:10443
+    accessKey: ${HUAWEI_OBS_ACCESS_KEY}
+    accessSecretKey: ${HUAWEI_OBS_ACCESS_SECRET_KEY}
