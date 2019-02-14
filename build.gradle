@@ -1,0 +1,50 @@
+group 'com.github.aaric'
+version '0.0.1-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    /*jcenter()*/
+    maven { url 'https://maven.aliyun.com/repository/public' }
+}
+
+dependencies {
+    compile("org.apache.commons:commons-lang3:3.+")
+
+    compile("org.springframework.boot:spring-boot-starter:1.5.+")
+    compile("org.springframework.boot:spring-boot-starter-log4j2:1.5+")
+
+    testCompile("junit:junit:4.12")
+    testCompile("org.springframework.boot:spring-boot-starter-test:1.5.+")
+}
+
+configurations {
+    compile.exclude group: "org.springframework.boot", module: 'spring-boot-starter-logging'
+}
+
+buildscript {
+    repositories {
+        /*jcenter()*/
+        maven { url 'https://maven.aliyun.com/repository/public' }
+    }
+
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.+"
+    }
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+    options.compilerArgs << "-Xlint:unchecked"
+}
+
+compileTestJava {
+    options.encoding = "UTF-8"
+    options.compilerArgs << "-Xlint:unchecked"
+}
+
+defaultTasks "assemble"
