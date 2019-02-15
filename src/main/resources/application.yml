@@ -7,8 +7,9 @@ spring:
 huawei:
   sms:
     apiHost: https://api.rtc.huaweicloud.com:10443
-    accessKey: ${HUAWEI_OBS_ACCESS_KEY}
-    accessSecretKey: ${HUAWEI_OBS_ACCESS_SECRET_KEY}
+    accessKey: ${HUAWEI_SMS_ACCESS_KEY}
+    accessSecretKey: ${HUAWEI_SMS_ACCESS_SECRET_KEY}
+    callBackUrl: ${HUAWEI_SMS_CALLBACK_URL:}
     test:
       number: 13400000000
       bizId: 000000000000000000^0
