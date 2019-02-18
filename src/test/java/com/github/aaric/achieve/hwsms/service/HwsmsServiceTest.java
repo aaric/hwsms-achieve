@@ -1,5 +1,8 @@
 package com.github.aaric.achieve.hwsms.service;
 
+import com.github.aaric.achieve.hwsms.entity.HwSmsMsg;
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +33,17 @@ public class HwsmsServiceTest {
     private String testNumber;
 
     @Test
+    @Ignore
     public void testSendSms() {
         List<HwsmsService.HwsmsResult> result = hwsmsService.sendSms("8819021457459|8b4cb860c1064c4aa7064f01da98168b", Arrays.asList("123456"), testNumber);
         System.out.println(result);
+    }
+
+    @Test
+    @Ignore
+    public void testSendSmsMsg() {
+        List<String> templateParams = Arrays.asList("123456");
+        HwSmsMsg smsMsg = new HwSmsMsg(testNumber, HwSmsMsg.SMS_TEMPLATE_CODE_VALIDATE, templateParams);
+        Assert.assertNotNull(hwsmsService.sendSms(smsMsg.getTemplateCode(), smsMsg.getTemplateParams(), smsMsg.getMobile()));
     }
 }
