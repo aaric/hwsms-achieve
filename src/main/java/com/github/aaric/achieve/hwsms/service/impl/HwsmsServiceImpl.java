@@ -104,7 +104,7 @@ public class HwsmsServiceImpl implements HwsmsService {
         String receiver = getFormatTosString(tos);
 
         // 客户的回调地址：选填,短信状态报告接收地址,推荐使用域名,为空或者不填表示不接收状态报告
-        String statusCallBackUrl = "";
+        String statusCallBackUrl = callBackUrl;
 
         // 请求Body：不携带签名名称时,signature请填null
         String body = buildRequestBody(sender, receiver, templateId, templateParas, statusCallBackUrl, signature);
@@ -137,10 +137,10 @@ public class HwsmsServiceImpl implements HwsmsService {
                     .setEntity(new StringEntity(body)).build());
 
             // 打印响应头域信息
-            if (200 == response.getStatusLine().getStatusCode()) {
+            if (null != response) {
                 // 获得返回信息
                 String result = EntityUtils.toString(response.getEntity());
-                System.out.println(result);
+                //System.out.println(result);
                 if (StringUtils.isNotBlank(result)) {
                     HwsmsResultStatus status = gson.fromJson(result, HwsmsResultStatus.class);
                     if (null != status && HwsmsResultStatus.SUCCESS_CODE.equals(status.getCode())) {
@@ -148,7 +148,6 @@ public class HwsmsServiceImpl implements HwsmsService {
                     }
                 }
             }
-            System.out.println(); //打印响应消息实体
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -230,41 +229,5 @@ public class HwsmsServiceImpl implements HwsmsService {
         String passwordDigestBase64Str = Base64.getEncoder().encodeToString(hexDigest.getBytes());
 
         return String.format(WSSE_HEADER_FORMAT, appKey, passwordDigestBase64Str, nonce, time);
-    }
-
-    /**
-     * 发送短信状态
-     */
-    static class HwsmsResultStatus {
-
-        public static final String SUCCESS_CODE = "000000";
-
-        private String code;
-        private String description;
-        private List<HwsmsResult> result;
-
-        public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public List<HwsmsResult> getResult() {
-            return result;
-        }
-
-        public void setResult(List<HwsmsResult> result) {
-            this.result = result;
-        }
     }
 }
