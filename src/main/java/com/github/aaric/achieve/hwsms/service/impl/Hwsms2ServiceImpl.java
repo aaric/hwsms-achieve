@@ -1,5 +1,6 @@
 package com.github.aaric.achieve.hwsms.service.impl;
 
+import com.github.aaric.achieve.hwsms.service.Hwsms2Service;
 import com.github.aaric.achieve.hwsms.service.HwsmsService;
 import com.google.gson.Gson;
 import org.apache.commons.codec.binary.Hex;
@@ -26,13 +27,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * 华为云发送短信接口实现
+ * 华为云发送短信接口实现（免模板）
  *
- * @author Aaric, created on 2019-02-15T15:37.
- * @since 0.2.0-SNAPSHOT
+ * @author Aaric, created on 2019-04-09T17:20.
+ * @since 0.3.0-SNAPSHOT
  */
 @Service
-public class HwsmsServiceImpl implements HwsmsService {
+public class Hwsms2ServiceImpl implements Hwsms2Service {
 
     /**
      * 无需修改,用于格式化鉴权头域,给"X-WSSE"参数赋值
@@ -74,35 +75,16 @@ public class HwsmsServiceImpl implements HwsmsService {
     @Value("${huawei.sms.signature}")
     private String signature;
 
+    /**
+     * 签名通道号
+     */
+    @Value("${huawei.sms.signatureNumber}")
+    private String signatureNumber;
+
     @Override
-    public List<HwsmsResult> sendSms(String templateCode, List<String> templateParams, String... tos) {
+    public List<HwsmsService.HwsmsResult> sendSms(String smsText, String... tos) {
         // APP接入地址：必填,请参考"开发准备"获取如下数据,替换为实际值
         String url = apiHost + "/sms/batchSendSms/v1";
-
-        // 解析短信通道号和模板ID
-        if (StringUtils.isBlank(templateCode)) {
-            System.out.println("templateCode is blank.");
-            return null;
-        }
-        String[] senderTemplateIds = templateCode.split("\\|");
-        if (null == senderTemplateIds || 2 != senderTemplateIds.length) {
-            System.out.println("templateCode is error.");
-            return null;
-        }
-
-        // 短信通道号：国内短信签名通道号或国际/港澳台短信通道号
-        String sender = senderTemplateIds[0];
-
-        // 模板ID
-        String templateId = senderTemplateIds[1];
-
-        // 模板变量信息
-        if (null == templateParams || 0 == templateParams.size()) {
-            System.out.println("templateParams is null.");
-            return null;
-        }
-        Gson gson = new Gson();
-        String templateParas = gson.toJson(templateParams);
 
         // 短信接收人号码：必填,全局号码格式(包含国家码),示例:+8613400000000,多个号码之间用英文逗号分隔
         String receiver = getFormatTosString(tos);
@@ -110,12 +92,11 @@ public class HwsmsServiceImpl implements HwsmsService {
         // 客户的回调地址：选填,短信状态报告接收地址,推荐使用域名,为空或者不填表示不接收状态报告
         String statusCallBackUrl = callBackUrl;
 
-        // 请求Body：不携带签名名称时,signature请填null
-        String body = buildRequestBody(sender, receiver, templateId, templateParas, statusCallBackUrl, signature);
-        if (null == body || body.isEmpty()) {
-            System.out.println("body is null.");
-            return null;
-        }
+        // 由短信签名和短信内容两部分组成,短信签名必须在短信内容前面,国内短信签名由【】及签名名称组成
+        String body = "【" + signature + "】" + smsText;
+
+        // 请求Body
+        String content = buildRequestBody(signatureNumber, receiver, body, statusCallBackUrl);
 
         // 请求Headers中的X-WSSE参数值
         String wsseHeader = buildWsseHeader(accessKey, accessSecretKey);
@@ -146,16 +127,16 @@ public class HwsmsServiceImpl implements HwsmsService {
                     .addHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded")
                     .addHeader(HttpHeaders.AUTHORIZATION, AUTH_HEADER_VALUE)
                     .addHeader("X-WSSE", wsseHeader)
-                    .setEntity(new StringEntity(body)).build());
+                    .setEntity(new StringEntity(content)).build());
 
             // 打印响应头域信息
             if (null != response) {
                 // 获得返回信息
                 String result = EntityUtils.toString(response.getEntity());
-                //System.out.println(result);
+                System.out.println(result);
                 if (StringUtils.isNotBlank(result)) {
-                    HwsmsResultStatus status = gson.fromJson(result, HwsmsResultStatus.class);
-                    if (null != status && HwsmsResultStatus.SUCCESS_CODE.equals(status.getCode())) {
+                    HwsmsService.HwsmsResultStatus status = new Gson().fromJson(result, HwsmsService.HwsmsResultStatus.class);
+                    if (null != status && HwsmsService.HwsmsResultStatus.SUCCESS_CODE.equals(status.getCode())) {
                         return status.getResult();
                     }
                 }
@@ -187,34 +168,23 @@ public class HwsmsServiceImpl implements HwsmsService {
      *
      * @param sender            短信通道号
      * @param receiver          短信接收人号码
-     * @param templateId        模板ID
-     * @param templateParas     模板变量信息
+     * @param body              短信内容
      * @param statusCallbackUrl 客户的回调地址
-     * @param signature         签名名称,使用国内短信通用模板时填写
      * @return
      */
-    private String buildRequestBody(String sender, String receiver, String templateId, String templateParas,
-                                    String statusCallbackUrl, String signature) {
-        if (null == sender || null == receiver || null == templateId || sender.isEmpty() || receiver.isEmpty()
-                || templateId.isEmpty()) {
-            System.out.println("buildRequestBody(): sender, receiver or templateId is null.");
+    private String buildRequestBody(String sender, String receiver, String body, String statusCallbackUrl) {
+        if (null == sender || null == receiver || sender.isEmpty() || receiver.isEmpty()) {
+            System.out.println("buildRequestBody(): sender, receiver or body is null.");
             return null;
         }
         List<NameValuePair> keyValues = new ArrayList<NameValuePair>();
 
         keyValues.add(new BasicNameValuePair("from", sender));
         keyValues.add(new BasicNameValuePair("to", receiver));
-        keyValues.add(new BasicNameValuePair("templateId", templateId));
-        if (null != templateParas && !templateParas.isEmpty()) {
-            keyValues.add(new BasicNameValuePair("templateParas", templateParas));
-        }
-        if (null != statusCallbackUrl && !statusCallbackUrl.isEmpty()) {
-            keyValues.add(new BasicNameValuePair("statusCallback", statusCallbackUrl));
-        }
-        if (null != signature && !signature.isEmpty()) {
-            keyValues.add(new BasicNameValuePair("signature", signature));
-        }
+        keyValues.add(new BasicNameValuePair("body", body));
+        keyValues.add(new BasicNameValuePair("statusCallback", statusCallbackUrl));
 
+        //如果JDK版本是1.6,可使用:URLEncodedUtils.format(keyValues, Charset.forName("UTF-8"));
         return URLEncodedUtils.format(keyValues, StandardCharsets.UTF_8);
     }
 
