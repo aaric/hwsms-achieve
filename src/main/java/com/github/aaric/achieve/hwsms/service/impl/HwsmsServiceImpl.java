@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -121,11 +122,19 @@ public class HwsmsServiceImpl implements HwsmsService {
         }
 
         try {
+            // 设置超时时间(5秒默认值)
+            RequestConfig config = RequestConfig.custom()
+                    .setSocketTimeout(5000)
+                    .setConnectTimeout(5000)
+                    .setConnectionRequestTimeout(5000)
+                    .build();
+
             // 为防止因HTTPS证书认证失败造成API调用失败,需要先忽略证书信任问题
             CloseableHttpClient client = HttpClients.custom()
                     .setSSLContext(new SSLContextBuilder().loadTrustMaterial(null,
                             (x509CertChain, authType) -> true).build())
                     .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                    .setDefaultRequestConfig(config)
                     .build();
 
             // 执行发送短信调用
