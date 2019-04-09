@@ -133,7 +133,7 @@ public class Hwsms2ServiceImpl implements Hwsms2Service {
             if (null != response) {
                 // 获得返回信息
                 String result = EntityUtils.toString(response.getEntity());
-                System.out.println(result);
+                //System.out.println(result);
                 if (StringUtils.isNotBlank(result)) {
                     HwsmsService.HwsmsResultStatus status = new Gson().fromJson(result, HwsmsService.HwsmsResultStatus.class);
                     if (null != status && HwsmsService.HwsmsResultStatus.SUCCESS_CODE.equals(status.getCode())) {
