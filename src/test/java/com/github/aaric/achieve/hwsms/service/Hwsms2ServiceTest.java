@@ -1,6 +1,7 @@
 package com.github.aaric.achieve.hwsms.service;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class Hwsms2ServiceTest {
     private String testNumber;
 
     @Test
+    @Ignore
     public void testSendSms() {
         Assert.assertNotNull(hwsms2Service.sendSms("这是一条测试短信！", testNumber));
     }
