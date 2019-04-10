@@ -1,5 +1,6 @@
 package com.github.aaric.achieve.hwsms.service;
 
+import com.github.aaric.achieve.hwsms.entity.SmsMsg;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -8,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Hwsms2ServiceTest
@@ -31,6 +35,9 @@ public class Hwsms2ServiceTest {
     @Test
     @Ignore
     public void testSendSms() {
-        Assert.assertNotNull(hwsms2Service.sendSms("这是一条测试短信！", testNumber));
+        Map<String, String> templateParams = new HashMap<>();
+        templateParams.put("code", "123456");
+        //Assert.assertNotNull(hwsms2Service.sendSms(new SmsMsg(testNumber, SmsMsg.SMS_TEMPLATE_CODE_TEST, templateParams), testNumber));
+        Assert.assertNotNull(hwsms2Service.sendSms(new SmsMsg(testNumber, SmsMsg.SMS_TEMPLATE_CODE_VALIDATE, templateParams), testNumber));
     }
 }
