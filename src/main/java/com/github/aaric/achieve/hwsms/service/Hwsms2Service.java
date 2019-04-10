@@ -1,5 +1,6 @@
 package com.github.aaric.achieve.hwsms.service;
 
+import com.github.aaric.achieve.hwsms.entity.SmsMsg;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
@@ -15,11 +16,11 @@ public interface Hwsms2Service {
     /**
      * 发送短信
      *
-     * @param smsText 短信内容
-     * @param tos     发送人
+     * @param smsMsg 短信实体
+     * @param tos    发送人
      * @return 结果信息
      */
-    List<HwsmsService.HwsmsResult> sendSms(String smsText, String... tos);
+    List<HwsmsResult> sendSms(SmsMsg smsMsg, String... tos);
 
     /**
      * 短信发送结果
@@ -68,7 +69,7 @@ public interface Hwsms2Service {
 
         private String code;
         private String description;
-        private List<HwsmsService.HwsmsResult> result;
+        private List<HwsmsResult> result;
 
         public String getCode() {
             return code;
@@ -86,11 +87,11 @@ public interface Hwsms2Service {
             this.description = description;
         }
 
-        public List<HwsmsService.HwsmsResult> getResult() {
+        public List<HwsmsResult> getResult() {
             return result;
         }
 
-        public void setResult(List<HwsmsService.HwsmsResult> result) {
+        public void setResult(List<HwsmsResult> result) {
             this.result = result;
         }
 

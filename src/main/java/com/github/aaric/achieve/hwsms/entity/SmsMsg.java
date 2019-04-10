@@ -3,23 +3,26 @@ package com.github.aaric.achieve.hwsms.entity;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
 
 /**
- * 华为短信消息实体
+ * 短信消息实体
  *
- * @author Aaric, created on 2018-01-18T10:56.
- * @since 1.3.16-SNAPSHOT
+ * @author Aaric, created on 2019-04-10T13:37.
+ * @since 0.3.2-SNAPSHOT
  */
-public class HwSmsMsg {
+public class SmsMsg {
 
     /**
-     * 模板编码-验证码（签名通道号|审核通过模板ID）
+     * 模板编码-验证码（签名通道号|自定义模板ID）
      */
-    public static final String SMS_TEMPLATE_CODE_VALIDATE = "8819021361625|3a74f416959146469dc3d4f8ad9ac7a8";
+    public static final String SMS_TEMPLATE_CODE_TEST = "10690549122901306|TSP-SMS-001";
+
+    /**
+     * 模板编码-验证码（签名通道号|自定义模板ID）
+     */
+    public static final String SMS_TEMPLATE_CODE_VALIDATE = "10690549122901306|TSP-SMS-002";
 
     /**
      * 短信模板信息
@@ -29,8 +32,10 @@ public class HwSmsMsg {
     static {
         // 添加短信模板信息
         SMS_TEMPLATE_INFO = new HashMap<>();
+        // 测试
+        SMS_TEMPLATE_INFO.put(SMS_TEMPLATE_CODE_TEST, "这是一条测试短信！");
         // 验证码
-        SMS_TEMPLATE_INFO.put(SMS_TEMPLATE_CODE_VALIDATE, "您的验证码为${NUM_6}，两分钟内有效。如非本人操作，请忽略本短信。");
+        SMS_TEMPLATE_INFO.put(SMS_TEMPLATE_CODE_VALIDATE, "您的验证码为${code}，两分钟内有效。如非本人操作，请忽略本短信。");
     }
 
     /**
@@ -44,14 +49,14 @@ public class HwSmsMsg {
     private String templateCode;
 
     /**
-     * 模板参数信息列表
+     * 模板参数信息
      */
-    private List<String> templateParams;
+    private Map<String, String> templateParams;
 
-    public HwSmsMsg() {
+    public SmsMsg() {
     }
 
-    public HwSmsMsg(String mobile, String templateCode, List<String> templateParams) {
+    public SmsMsg(String mobile, String templateCode, Map<String, String> templateParams) {
         this.mobile = mobile;
         this.templateCode = templateCode;
         this.templateParams = templateParams;
@@ -65,23 +70,12 @@ public class HwSmsMsg {
     public String getContent() {
         if (null != this.templateCode && null != this.templateParams) {
             String content = SMS_TEMPLATE_INFO.get(this.templateCode);
-
-            // 替换短信变量内容
             if (StringUtils.isNotBlank(content)) {
-                int i = 0;
-                Pattern p = Pattern.compile("\\$\\{[a-zA-Z_0-9]*\\}");
-                Matcher m = p.matcher(content);
-                StringBuffer sb = new StringBuffer();
-
-                // 替换字符串
-                while (m.find()) {
-                    if (i >= templateParams.size()) break;
-
-                    m.appendReplacement(sb, templateParams.get(i++));
+                Set<Map.Entry<String, String>> params = this.templateParams.entrySet();
+                for (Map.Entry<String, String> object : params) {
+                    content = content.replace("${" + object.getKey() + "}", object.getValue());
                 }
-                m.appendTail(sb);
-
-                return sb.toString();
+                return content;
             }
         }
         return null;
@@ -103,11 +97,11 @@ public class HwSmsMsg {
         this.templateCode = templateCode;
     }
 
-    public List<String> getTemplateParams() {
+    public Map<String, String> getTemplateParams() {
         return templateParams;
     }
 
-    public void setTemplateParams(List<String> templateParams) {
+    public void setTemplateParams(Map<String, String> templateParams) {
         this.templateParams = templateParams;
     }
 }

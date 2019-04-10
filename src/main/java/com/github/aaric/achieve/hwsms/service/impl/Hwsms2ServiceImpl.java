@@ -1,5 +1,6 @@
 package com.github.aaric.achieve.hwsms.service.impl;
 
+import com.github.aaric.achieve.hwsms.entity.SmsMsg;
 import com.github.aaric.achieve.hwsms.service.Hwsms2Service;
 import com.github.aaric.achieve.hwsms.service.HwsmsService;
 import com.google.gson.Gson;
@@ -75,14 +76,35 @@ public class Hwsms2ServiceImpl implements Hwsms2Service {
     @Value("${huawei.sms.signature}")
     private String signature;
 
-    /**
-     * 签名通道号
-     */
-    @Value("${huawei.sms.signatureNumber}")
-    private String signatureNumber;
-
     @Override
-    public List<HwsmsService.HwsmsResult> sendSms(String smsText, String... tos) {
+    public List<HwsmsResult> sendSms(SmsMsg smsMsg, String... tos) {
+        // 解析短信通道号和模板ID
+        if (null == smsMsg || StringUtils.isBlank(smsMsg.getTemplateCode())) {
+            System.out.println("templateCode is blank.");
+            return null;
+        }
+        String[] senderTemplateIds = smsMsg.getTemplateCode().split("\\|");
+        if (null == senderTemplateIds || 2 != senderTemplateIds.length) {
+            System.out.println("templateCode is error.");
+            return null;
+        }
+
+        // 短信通道号：国内短信签名通道号或国际/港澳台短信通道号
+        String sender = senderTemplateIds[0];
+
+        // 发送短信
+        return sendSms(sender, smsMsg.getContent(), tos);
+    }
+
+    /**
+     * 发送短信
+     *
+     * @param sender  签名通道号
+     * @param smsText 短信内容
+     * @param tos     发送人
+     * @return
+     */
+    private List<HwsmsResult> sendSms(String sender, String smsText, String... tos) {
         // APP接入地址：必填,请参考"开发准备"获取如下数据,替换为实际值
         String url = apiHost + "/sms/batchSendSms/v1";
 
@@ -96,7 +118,8 @@ public class Hwsms2ServiceImpl implements Hwsms2Service {
         String body = "【" + signature + "】" + smsText;
 
         // 请求Body
-        String content = buildRequestBody(signatureNumber, receiver, body, statusCallBackUrl);
+        String content = buildRequestBody(sender, receiver, body, statusCallBackUrl);
+        //System.out.println("body is " + content);
 
         // 请求Headers中的X-WSSE参数值
         String wsseHeader = buildWsseHeader(accessKey, accessSecretKey);
@@ -135,7 +158,7 @@ public class Hwsms2ServiceImpl implements Hwsms2Service {
                 String result = EntityUtils.toString(response.getEntity());
                 //System.out.println(result);
                 if (StringUtils.isNotBlank(result)) {
-                    HwsmsService.HwsmsResultStatus status = new Gson().fromJson(result, HwsmsService.HwsmsResultStatus.class);
+                    HwsmsResultStatus status = new Gson().fromJson(result, HwsmsResultStatus.class);
                     if (null != status && HwsmsService.HwsmsResultStatus.SUCCESS_CODE.equals(status.getCode())) {
                         return status.getResult();
                     }
