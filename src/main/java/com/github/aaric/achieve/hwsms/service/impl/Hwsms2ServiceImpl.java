@@ -77,7 +77,7 @@ public class Hwsms2ServiceImpl implements Hwsms2Service {
     private String signature;
 
     @Override
-    public List<HwsmsResult> sendSms(SmsMsg smsMsg, String... tos) {
+    public List<HwsmsResult> sendSms(SmsMsg smsMsg) {
         // 解析短信通道号和模板ID
         if (null == smsMsg || StringUtils.isBlank(smsMsg.getTemplateCode())) {
             System.out.println("templateCode is blank.");
@@ -93,7 +93,7 @@ public class Hwsms2ServiceImpl implements Hwsms2Service {
         String sender = senderTemplateIds[0];
 
         // 发送短信
-        return sendSms(sender, smsMsg.getContent(), tos);
+        return sendSms(sender, smsMsg.getContent(), smsMsg.getMobile());
     }
 
     /**
