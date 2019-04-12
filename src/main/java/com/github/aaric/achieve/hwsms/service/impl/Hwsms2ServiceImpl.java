@@ -1,6 +1,6 @@
 package com.github.aaric.achieve.hwsms.service.impl;
 
-import com.github.aaric.achieve.hwsms.entity.SmsMsg;
+import com.github.aaric.achieve.hwsms.entity.HwSmsMsg2;
 import com.github.aaric.achieve.hwsms.service.Hwsms2Service;
 import com.github.aaric.achieve.hwsms.service.HwsmsService;
 import com.google.gson.Gson;
@@ -77,13 +77,13 @@ public class Hwsms2ServiceImpl implements Hwsms2Service {
     private String signature;
 
     @Override
-    public List<HwsmsResult> sendSms(SmsMsg smsMsg) {
+    public List<HwsmsResult> sendSms(HwSmsMsg2 hwSmsMsg2) {
         // 解析短信通道号和模板ID
-        if (null == smsMsg || StringUtils.isBlank(smsMsg.getTemplateCode())) {
+        if (null == hwSmsMsg2 || StringUtils.isBlank(hwSmsMsg2.getTemplateCode())) {
             System.out.println("templateCode is blank.");
             return null;
         }
-        String[] senderTemplateIds = smsMsg.getTemplateCode().split("\\|");
+        String[] senderTemplateIds = hwSmsMsg2.getTemplateCode().split("\\|");
         if (null == senderTemplateIds || 2 != senderTemplateIds.length) {
             System.out.println("templateCode is error.");
             return null;
@@ -93,7 +93,7 @@ public class Hwsms2ServiceImpl implements Hwsms2Service {
         String sender = senderTemplateIds[0];
 
         // 发送短信
-        return sendSms(sender, smsMsg.getContent(), smsMsg.getMobile());
+        return sendSms(sender, hwSmsMsg2.getContent(), hwSmsMsg2.getMobile());
     }
 
     /**
