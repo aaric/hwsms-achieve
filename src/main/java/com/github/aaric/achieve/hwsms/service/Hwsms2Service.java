@@ -17,10 +17,9 @@ public interface Hwsms2Service {
      * 发送短信
      *
      * @param smsMsg 短信实体
-     * @param tos    发送人
      * @return 结果信息
      */
-    List<HwsmsResult> sendSms(SmsMsg smsMsg, String... tos);
+    List<HwsmsResult> sendSms(SmsMsg smsMsg);
 
     /**
      * 短信发送结果
