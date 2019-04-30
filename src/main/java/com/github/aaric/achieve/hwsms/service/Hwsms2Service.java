@@ -1,6 +1,6 @@
 package com.github.aaric.achieve.hwsms.service;
 
-import com.github.aaric.achieve.hwsms.entity.SmsMsg;
+import com.github.aaric.achieve.hwsms.entity.HwSmsMsg2;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
@@ -16,10 +16,10 @@ public interface Hwsms2Service {
     /**
      * 发送短信
      *
-     * @param smsMsg 短信实体
+     * @param hwSmsMsg2 短信实体
      * @return 结果信息
      */
-    List<HwsmsResult> sendSms(SmsMsg smsMsg);
+    List<HwsmsResult> sendSms(HwSmsMsg2 hwSmsMsg2);
 
     /**
      * 短信发送结果

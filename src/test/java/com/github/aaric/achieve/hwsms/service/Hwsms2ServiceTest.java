@@ -1,6 +1,6 @@
 package com.github.aaric.achieve.hwsms.service;
 
-import com.github.aaric.achieve.hwsms.entity.SmsMsg;
+import com.github.aaric.achieve.hwsms.entity.HwSmsMsg2;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -38,6 +38,6 @@ public class Hwsms2ServiceTest {
         Map<String, String> templateParams = new HashMap<>();
         templateParams.put("code", "123456");
         //Assert.assertNotNull(hwsms2Service.sendSms(new SmsMsg(testNumber, SmsMsg.SMS_TEMPLATE_CODE_TEST, templateParams), testNumber));
-        Assert.assertNotNull(hwsms2Service.sendSms(new SmsMsg(testNumber, SmsMsg.SMS_TEMPLATE_CODE_VALIDATE, templateParams)));
+        Assert.assertNotNull(hwsms2Service.sendSms(new HwSmsMsg2(testNumber, HwSmsMsg2.SMS_TEMPLATE_CODE_VALIDATE, templateParams)));
     }
 }

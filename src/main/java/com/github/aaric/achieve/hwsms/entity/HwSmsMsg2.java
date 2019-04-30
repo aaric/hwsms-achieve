@@ -12,7 +12,7 @@ import java.util.Set;
  * @author Aaric, created on 2019-04-10T13:37.
  * @since 0.3.2-SNAPSHOT
  */
-public class SmsMsg {
+public class HwSmsMsg2 {
 
     /**
      * 模板编码-验证码（签名通道号|自定义模板ID）
@@ -53,10 +53,10 @@ public class SmsMsg {
      */
     private Map<String, String> templateParams;
 
-    public SmsMsg() {
+    public HwSmsMsg2() {
     }
 
-    public SmsMsg(String mobile, String templateCode, Map<String, String> templateParams) {
+    public HwSmsMsg2(String mobile, String templateCode, Map<String, String> templateParams) {
         this.mobile = mobile;
         this.templateCode = templateCode;
         this.templateParams = templateParams;
